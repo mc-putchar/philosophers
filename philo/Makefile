@@ -6,7 +6,7 @@
 #    By: mcutura <mcutura@student.42berlin.de>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/06/16 08:43:01 by mcutura           #+#    #+#              #
-#    Updated: 2023/07/10 02:55:23 by mcutura          ###   ########.fr        #
+#    Updated: 2023/07/10 03:59:37 by mcutura          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -22,7 +22,7 @@ SRCS := $(addprefix $(SRCDIR)/, $(_SRCS))
 #--- OBJECTS ---
 OBJS := $(addprefix $(OBJDIR)/, $(_SRCS:.c=.o))
 #--- HEADERS ---
-HEADERS := $(addprefix $(INCDIR)/, philo.h ansi_codes.h)
+HEADERS := $(INCDIR)/philo.h
 #--- FLAGS ---
 CC := cc
 debug: CFLAGS := -Wall -Wextra -I$(INCDIR) -pthread -g -D DEBUG
