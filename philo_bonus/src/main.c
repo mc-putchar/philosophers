@@ -6,30 +6,46 @@
 /*   By: mcutura <mcutura@student.42berlin.de>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/10 03:58:45 by mcutura           #+#    #+#             */
-/*   Updated: 2023/07/10 07:56:23 by mcutura          ###   ########.fr       */
+/*   Updated: 2023/07/10 13:51:40 by mcutura          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo_bonus.h"
 
-void	*phull_counter_f(void *arg)
+static void	*monitor_meals(void *data)
 {
-	t_data	*data;
-	int		phull;
+	t_data	*d;
+	int		i;
 
-	data = (t_data *)arg;
-	phull = -1;
-	while (++phull < data->philo_n)
-		sem_wait(data->phullo);
-	sem_post(data->bad_news);
+	d = (t_data *)data;
+	i = -1;
+	while (++i < d->philo_n)
+		sem_wait(d->phullo);
+	sem_post(d->bad_news);
 	return (NULL);
+}
+
+static int	give_life(t_data *d)
+{
+	int	i;
+
+	i = -1;
+	while (++i < d->philo_n)
+	{
+		d->philo[i].pid = fork();
+		if (d->philo[i].pid == -1)
+			return (error_handler("Error: fork failed\n", shred_data, d));
+		if (!d->philo[i].pid)
+			philo_life(&d->philo[i]);
+	}
+	return (0);
 }
 
 int	main(int ac, char **av)
 {
 	t_data		data;
 	int			i;
-	pthread_t	phull_counter;
+	pthread_t	monitor;
 
 	if (ac < 5 || ac > 6)
 		return (printf("%s\n", USAGE), EXIT_SUCCESS);
@@ -37,13 +53,13 @@ int	main(int ac, char **av)
 		return (error_handler("Error: invalid arguments\n", NULL, NULL));
 	if (init_data(&data, ac, av))
 		return (EXIT_FAILURE);
-	if (pthread_create(&phull_counter, NULL, &phull_counter_f, &data))
-		return (error_handler("Error: pthread_create failed\n", \
-			destroy_semaphores, &data));
-	sem_wait(data.bad_news);
+	pthread_create(&monitor, NULL, monitor_meals, &data);
+	// pthread_detach(monitor);
+	if (give_life(&data))
+		return (EXIT_FAILURE);
 	i = -1;
+	sem_wait(data.bad_news);
 	while (++i < data.philo_n)
 		kill(data.philo[i].pid, SIGKILL);
-	(void)pthread_join(phull_counter, NULL);
-	return (0);
+	return (shred_data(&data), 0);
 }

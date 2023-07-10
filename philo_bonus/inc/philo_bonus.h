@@ -6,7 +6,7 @@
 /*   By: mcutura <mcutura@student.42berlin.de>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/10 03:57:21 by mcutura           #+#    #+#             */
-/*   Updated: 2023/07/10 07:50:10 by mcutura          ###   ########.fr       */
+/*   Updated: 2023/07/10 11:29:47 by mcutura          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,10 +81,12 @@ struct s_philo
 	int				id;
 	int				meals;
 	struct timeval	last_meal;
+	struct timeval	start;
 	t_status		status;
 	t_data			*data;
 	pid_t			pid;
-	sem_t			*philosem;
+	pthread_t		reaper;
+	sem_t			*eat;
 };
 
 struct s_data
@@ -95,7 +97,6 @@ struct s_data
 	int				time_to_sleep;
 	int				time_to_think;
 	int				meals;
-	int				full_philos;
 	struct timeval	start;
 	struct s_philo	*philo;
 	sem_t			*forks;
@@ -117,7 +118,7 @@ int		uint_check(char **tab);
 /* Error Handling */
 int		error_handler(char *msg, int (*f)(), void *arg);
 int		destroy_semaphores(t_data *d);
-int		free_philos(t_data *d);
+int		shred_data(t_data *d);
 
 /* Init */
 int		init_data(t_data *d, int ac, char **av);
