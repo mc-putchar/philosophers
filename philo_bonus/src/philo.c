@@ -6,63 +6,64 @@
 /*   By: mcutura <mcutura@student.42berlin.de>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/10 05:04:49 by mcutura           #+#    #+#             */
-/*   Updated: 2023/07/10 15:05:46 by mcutura          ###   ########.fr       */
+/*   Updated: 2023/07/11 15:06:30 by mcutura          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo_bonus.h"
+
+static char	*get_sem_name(char *name, int i)
+{
+	char	*sem_name;
+	char	*tmp;
+
+	tmp = ft_itoa(i);
+	sem_name = ft_strjoin(name, tmp);
+	free(tmp);
+	if (!sem_name)
+		exit(error_handler("Error: malloc failed\n", NULL, NULL));
+	return (sem_name);
+}
+
+void	philo_life(t_philo *p)
+{
+	char const	*sem_name = get_sem_name("/philo", p->id);
+
+	(void)sem_unlink(sem_name);
+	p->dead = sem_open(sem_name, O_CREAT | O_EXCL, 0700, 0);
+	sem_unlink(sem_name);
+	free((void *)sem_name);
+	if (p->dead == SEM_FAILED)
+		exit(error_handler("Error: sem_open failed\n", NULL, NULL));
+	if (pthread_create(&p->reaper, NULL, nega_philo, p))
+		exit(error_handler("Error: nega thread failed\n", \
+		sem_close, p->dead));
+	sem_wait(p->data->sync);
+	gettimeofday(&p->last_meal, NULL);
+	sem_post(p->dead);
+	while (1)
+		if (philo_eat(p) || philo_sleep(p) || philo_think(p))
+			break ;
+	pthread_join(p->reaper, NULL);
+	exit(sem_close(p->dead));
+}
 
 void	*nega_philo(void *arg)
 {
 	t_philo	*p;
 
 	p = (t_philo *)arg;
-	ft_sleepms(p->data->time_to_die);
 	while (1)
 	{
-		sem_wait(p->eat);
+		sem_wait(p->dead);
 		if (get_elapsed_time(p->last_meal) > p->data->time_to_die)
-			exit(philo_die(p));
+		{
+			(void)philo_die(p);
+			return (NULL);
+		}
 		else
-			sem_post(p->eat);
+			sem_post(p->dead);
 		ft_sleepms(1);
 	}
-}
-
-static int	han_solo_dies(t_philo *p)
-{
-	(void)sem_wait(p->data->forks);
-	(void)status_log(p, C_FORK);
-	ft_sleepms(p->data->time_to_die);
-	(void)philo_die(p);
-	(void)sem_post(p->data->forks);
-	return (shred_data(p->data));
-}
-
-void	philo_life(t_philo	*p)
-{
-	p->status = READY;
-	(void)sem_unlink("eat");
-	p->eat = sem_open("eat", O_CREAT, 0644, 1);
-	if (p->eat == SEM_FAILED)
-		exit(error_handler("Error: sem_open failed\n", shred_data, p->data));
-	gettimeofday(&p->start, NULL);
-	p->last_meal = p->start;
-	if (p->data->philo_n == 1)
-		exit(han_solo_dies(p));
-	if (pthread_create(&p->reaper, NULL, nega_philo, p))
-		exit(error_handler("Error: pthread_create\n", shred_data, p->data));
-	pthread_detach(p->reaper);
-	if (!(p->id & 1))
-		ft_sleepms(p->data->time_to_eat - 1);
-	while (1)
-	{
-		if (philo_eat(p))
-			exit(shred_data(p->data));
-		if (status_log(p, C_SLEEP))
-			exit(shred_data(p->data));
-		ft_sleepms(p->data->time_to_sleep);
-		if (philo_think(p))
-			exit(shred_data(p->data));
-	}
+	return (NULL);
 }

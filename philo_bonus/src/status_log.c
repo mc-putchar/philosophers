@@ -6,7 +6,7 @@
 /*   By: mcutura <mcutura@student.42berlin.de>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/16 10:01:30 by mcutura           #+#    #+#             */
-/*   Updated: 2023/07/10 11:37:50 by mcutura          ###   ########.fr       */
+/*   Updated: 2023/07/11 14:17:02 by mcutura          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,9 @@ int	status_log(t_philo *p, char *msg)
 
 	if (sem_wait(p->data->write))
 		return (error_handler("Error: sem_wait failed\n", NULL, NULL));
-	time = get_elapsed_time(p->start);
+	if (p->data->sim_end)
+		return (sem_post(p->data->write), 1);
+	time = get_elapsed_time(p->data->start);
 	printf(PRINT_FORMAT, time, p->id, msg);
 	if (sem_post(p->data->write))
 		return (error_handler("Error: sem_post failed\n", NULL, NULL));
