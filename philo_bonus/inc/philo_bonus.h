@@ -6,7 +6,7 @@
 /*   By: mcutura <mcutura@student.42berlin.de>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/10 03:57:21 by mcutura           #+#    #+#             */
-/*   Updated: 2023/07/11 15:15:00 by mcutura          ###   ########.fr       */
+/*   Updated: 2023/07/11 15:25:37 by mcutura          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@
 #  define C_SLEEP		"\033[36mis sleeping\033[0m"
 #  define C_THINK		"\033[35mis thinking\033[0m"
 #  define C_DIE			"\033[1m\033[4m\033[31mdied\033[0m"
-# define PRINT_FORMAT	"%6d %3d %s\n"
+#  define PRINT_FORMAT	"%6d %3d %s\n"
 # endif
 
 # define MAX_INT_S	"2147483647"
