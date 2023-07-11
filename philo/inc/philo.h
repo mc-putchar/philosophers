@@ -6,7 +6,7 @@
 /*   By: mcutura <mcutura@student.42berlin.de>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/16 07:52:33 by mcutura           #+#    #+#             */
-/*   Updated: 2023/07/10 03:19:24 by mcutura          ###   ########.fr       */
+/*   Updated: 2023/07/11 15:19:14 by mcutura          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@
 # define C_SLEEP		"is sleeping"
 # define C_THINK		"is thinking"
 # define C_DIE			"died"
-# define PRINT_FORMAT	"%6d %3d %s\n"
+# define PRINT_FORMAT	"%d %d %s\n"
 # ifdef DEBUG
 #  ifdef COLORS
 #   undef COLORS
@@ -53,6 +53,7 @@
 #  define C_SLEEP		"\033[36mis sleeping\033[0m"
 #  define C_THINK		"\033[35mis thinking\033[0m"
 #  define C_DIE			"\033[1m\033[4m\033[31mdied\033[0m"
+#  define PRINT_FORMAT	"%6d %3d %s\n"
 # endif
 
 # define MAX_INT_S	"2147483647"
